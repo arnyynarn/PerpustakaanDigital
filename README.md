@@ -124,7 +124,7 @@ Jika ingin mengaktifkan database online di cloud:
 
 Sistem menerapkan pemisahan hak akses (**Role-Based Access Control**):
 * **Akun Anggota / Mahasiswa (Peminjam Buku):**
-  * **Email:** `dimas@kampus.ac.id` (atau daftar akun baru di halaman depan).
+  * **Email:** `arni@kampus.ac.id` (atau daftar akun baru di halaman depan).
   * **Hak Akses:** Hanya dapat mencari buku, meminjam buku, melihat riwayat peminjaman pribadi, dan mencetak resi. Tidak memiliki akses ke panel admin.
 * **Akun Administrator (Pengelola Perpustakaan):**
   * **Email:** `admin@libraverse.id` | **Password:** Password akun admin Anda (atau `admin123` pada mode lokal).
