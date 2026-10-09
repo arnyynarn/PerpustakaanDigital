@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="LibraVerse Admin — Panel administrasi perpustakaan digital." />
+  <title>LibraVerse — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="admin-body">
+
+<!-- ============================================== ADMIN AUTH GATE (LOCKSCREEN) ============================================== -->
+<div id="adminAuthGate" class="admin-gate-overlay">
+  <div class="admin-gate-card">
+    <div class="admin-gate-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    <h2>Akses Khusus Administrator</h2>
+    <p class="admin-gate-sub">Halaman ini dilindungi. Masuk dengan akun pengelola perpustakaan untuk mengelola data koleksi dan peminjaman.</p>
+    
+    <form id="adminLoginForm">
+      <div class="admin-demo-box" style="background:rgba(99,102,241,0.08);border:1px dashed rgba(99,102,241,0.35);border-radius:var(--r-md);padding:12px 14px;margin-bottom:20px;text-align:left;font-size:0.82rem;">
+        <p style="color:var(--primary-lt);font-weight:700;margin-bottom:6px;"><i class="fa-solid fa-key"></i> Kredensial Akses Administrator:</p>
+        <p style="color:var(--text2);margin:3px 0;">Email: <strong style="color:var(--text);font-family:monospace;">admin@libraverse.id</strong></p>
+        <p style="color:var(--text2);margin:3px 0;">Password: <strong style="color:var(--text);font-family:monospace;">admin123</strong></p>
+        <button type="button" id="btnFillAdmin" class="btn btn-ghost btn-sm btn-full" style="margin-top:10px;font-size:0.78rem;padding:6px;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Masuk Cepat sebagai Admin
+        </button>
+      </div>
+
+      <div class="field">
+        <label for="adminEmail"><i class="fa-solid fa-envelope"></i> Email Admin</label>
+        <input type="email" id="adminEmail" placeholder="admin@libraverse.id" required />
+      </div>
+      <div class="field">
+        <label for="adminPassword"><i class="fa-solid fa-lock"></i> Password</label>
+        <input type="password" id="adminPassword" placeholder="Masukkan password" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="btnAdminLogin">
+        <span class="btn-label"><i class="fa-solid fa-right-to-bracket"></i> Masuk sebagai Admin</span>
+        <div class="spin-sm"></div>
+      </button>
+      <div class="admin-gate-help">
+        <p>Bukan staf perpustakaan? <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Kembali ke Katalog Buku</a></p>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================== ADMIN SIDEBAR ============================================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-mark">L</div>
+      <span class="nav-name">Libra<em>Verse</em></span>
+    </a>
+    <span class="sidebar-badge">Admin</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <p class="sidebar-section-label">UTAMA</p>
+    <a href="#" class="sidebar-link active" data-page="dashboard">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <p class="sidebar-section-label">KELOLA</p>
+    <a href="#" class="sidebar-link" data-page="books">
+      <i class="fa-solid fa-book"></i>
+      <span>Kelola Buku</span>
+    </a>
+    <a href="#" class="sidebar-link" data-page="borrows">
+      <i class="fa-solid fa-hand-holding-heart"></i>
+      <span>Peminjaman</span>
+    </a>
+    <a href="#" class="sidebar-link" data-page="members">
+      <i class="fa-solid fa-users"></i>
+      <span>Anggota</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user" id="adminUser">
+      <div class="user-avatar">A</div>
+      <div class="sidebar-user-info">
+        <p class="sidebar-user-name" id="adminName">Admin</p>
+        <p class="sidebar-user-role">Administrator</p>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-sm btn-full" id="adminLogout">
+      <i class="fa-solid fa-right-from-bracket"></i> Keluar
+    </button>
+  </div>
+</aside>
+
+<!-- ============================================== ADMIN MAIN ============================================== -->
+<main class="admin-main" id="adminMain">
+  <!-- Top Bar -->
+  <header class="admin-topbar">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="topbar-right">
+      <a href="index.html" class="btn btn-ghost btn-sm" style="font-size:0.8rem;padding:6px 14px;">
+        <i class="fa-solid fa-arrow-left"></i> Lihat Katalog
+      </a>
+      <div class="topbar-status">
+        <span class="badge-dot" id="adminDot"></span>
+        <span id="adminStatus">Menghubungkan...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ PAGE: DASHBOARD ============ -->
+  <div class="admin-page active" id="pageDashboard">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Ringkasan data perpustakaan</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-ghost btn-sm" id="refreshDashboard">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="dash-stats">
+      <div class="dash-stat-card ds-primary">
+        <div class="ds-icon"><i class="fa-solid fa-book"></i></div>
+        <div class="ds-content">
+          <p class="ds-value" id="dsTotalBooks">0</p>
+          <p class="ds-label">Total Koleksi</p>
+        </div>
+      </div>
+      <div class="dash-stat-card ds-success">
+        <div class="ds-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div class="ds-content">
+          <p class="ds-value" id="dsTotalStock">0</p>
+          <p class="ds-label">Stok Tersedia</p>
+        </div>
+      </div>
+      <div class="dash-stat-card ds-warning">
+        <div class="ds-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+        <div class="ds-content">
+          <p class="ds-value" id="dsActiveBorrows">0</p>
+          <p class="ds-label">Aktif Dipinjam</p>
+        </div>
+      </div>
+      <div class="dash-stat-card ds-info">
+        <div class="ds-icon"><i class="fa-solid fa-users"></i></div>
+        <div class="ds-content">
+          <p class="ds-value" id="dsTotalMembers">0</p>
+          <p class="ds-label">Total Anggota</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="dash-grid">
+      <div class="dash-card">
+        <h3 class="dash-card-title"><i class="fa-solid fa-chart-bar"></i> Peminjaman per Genre</h3>
+        <div class="chart-container" id="genreChart"></div>
+      </div>
+      <div class="dash-card">
+        <h3 class="dash-card-title"><i class="fa-solid fa-clock"></i> Peminjaman Terbaru</h3>
+        <div class="recent-list" id="recentBorrows">
+          <p class="text-muted">Memuat data...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Low stock alert -->
+    <div class="dash-card">
+      <h3 class="dash-card-title"><i class="fa-solid fa-triangle-exclamation"></i> Buku Stok Rendah</h3>
+      <div class="low-stock-list" id="lowStockList">
+        <p class="text-muted">Memuat data...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PAGE: KELOLA BUKU ============ -->
+  <div class="admin-page" id="pageBooks">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Kelola Buku</h1>
+        <p class="page-subtitle">Tambah, edit, dan hapus koleksi buku</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary btn-sm" id="btnAddBook">
+          <i class="fa-solid fa-plus"></i> Tambah Buku
+        </button>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div class="search-field search-sm">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="adminBookSearch" placeholder="Cari buku..." />
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Judul</th>
+              <th>Penulis</th>
+              <th>Genre</th>
+              <th>Stok</th>
+              <th>Rating</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="adminBookTable">
+            <tr><td colspan="7" class="t-empty">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PAGE: PEMINJAMAN ============ -->
+  <div class="admin-page" id="pageBorrows">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Manajemen Peminjaman</h1>
+        <p class="page-subtitle">Kelola semua peminjaman buku</p>
+      </div>
+    </div>
+
+    <div class="borrow-filter-row">
+      <button class="filter-chip active" data-filter="all">Semua</button>
+      <button class="filter-chip" data-filter="active">Aktif</button>
+      <button class="filter-chip" data-filter="returned">Dikembalikan</button>
+      <button class="filter-chip" data-filter="overdue">Terlambat</button>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Peminjam</th>
+              <th>Buku</th>
+              <th>Tgl. Pinjam</th>
+              <th>Tgl. Kembali</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="adminBorrowTable">
+            <tr><td colspan="7" class="t-empty">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PAGE: ANGGOTA ============ -->
+  <div class="admin-page" id="pageMembers">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Kelola Anggota</h1>
+        <p class="page-subtitle">Daftar semua anggota perpustakaan</p>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div class="search-field search-sm">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="adminMemberSearch" placeholder="Cari anggota..." />
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>NIM / ID</th>
+              <th>Email</th>
+              <th>Terdaftar</th>
+              <th>Total Pinjam</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="adminMemberTable">
+            <tr><td colspan="7" class="t-empty">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============ MODALS ============ -->
+<!-- Book Form Modal -->
+<div class="modal-overlay" id="bookFormModal">
+  <div class="modal-card modal-md">
+    <button class="modal-close" id="bookFormClose">&times;</button>
+    <h3 class="modal-title" id="bookFormTitle">Tambah Buku</h3>
+    <form id="adminBookForm">
+      <input type="hidden" id="editBookId" />
+      <div class="field">
+        <label for="abJudul">Judul Buku</label>
+        <input type="text" id="abJudul" placeholder="Masukkan judul buku" required />
+      </div>
+      <div class="field">
+        <label for="abPenulis">Penulis</label>
+        <input type="text" id="abPenulis" placeholder="Nama penulis" required />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="abKategori">Genre</label>
+          <select id="abKategori" required>
+            <option value="">Pilih Genre</option>
+            <option>Teknologi</option>
+            <option>Fiksi</option>
+            <option>Sains</option>
+            <option>Sejarah</option>
+            <option>Bisnis</option>
+            <option>Filsafat</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="abStok">Stok</label>
+          <input type="number" id="abStok" placeholder="Jumlah stok" min="0" required />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="abRating">Rating (0-5)</label>
+          <input type="number" id="abRating" step="0.1" min="0" max="5" placeholder="4.5" />
+        </div>
+        <div class="field">
+          <label for="abGambar">URL Gambar (opsional)</label>
+          <input type="text" id="abGambar" placeholder="images/buku.jpg" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="abDeskripsi">Deskripsi (opsional)</label>
+        <textarea id="abDeskripsi" rows="3" placeholder="Deskripsi singkat tentang buku ini..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="bookFormCancel">Batal</button>
+        <button type="submit" class="btn btn-primary" id="bookFormSubmit">
+          <span class="btn-label">Simpan</span>
+          <div class="spin-sm"></div>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-card modal-sm">
+    <div class="confirm-icon" id="confirmIcon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h3 class="modal-title text-center" id="confirmTitle">Konfirmasi</h3>
+    <p class="text-center text-muted" id="confirmMsg">Apakah Anda yakin?</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="confirmCancel">Batal</button>
+      <button class="btn btn-danger" id="confirmOk">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<!-- ============================================== SCRIPTS ============================================== -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

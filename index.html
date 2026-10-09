@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="LibraVerse — Perpustakaan Digital. Cari, pinjam, dan pantau buku koleksi perpustakaan dari satu tempat." />
+  <title>LibraVerse — Perpustakaan Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============================================== LOADER ============================================== -->
+<div id="loader">
+  <div class="loader-brand">
+    <div class="loader-icon">L</div>
+    <span>Libra<em>Verse</em></span>
+  </div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  <p class="loader-label">Memuat perpustakaan&hellip;</p>
+</div>
+
+<!-- ============================================== AUTH MODAL ============================================== -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-card auth-modal">
+    <button class="modal-close" id="authClose">&times;</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Masuk</button>
+      <button class="auth-tab" data-tab="register">Daftar</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="auth-form active">
+      <div class="auth-header">
+        <h3>Selamat Datang</h3>
+        <p>Masuk ke akun perpustakaan Anda</p>
+      </div>
+      <div class="field">
+        <label for="loginEmail"><i class="fa-solid fa-envelope"></i> Email</label>
+        <input type="email" id="loginEmail" placeholder="nama@email.com" required />
+      </div>
+      <div class="field">
+        <label for="loginPassword"><i class="fa-solid fa-lock"></i> Password</label>
+        <input type="password" id="loginPassword" placeholder="Masukkan password" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">
+        <span class="btn-label">Masuk</span>
+        <div class="spin-sm"></div>
+      </button>
+      <p class="auth-switch">Belum punya akun? <a href="#" data-switch="register">Daftar sekarang</a></p>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" class="auth-form">
+      <div class="auth-header">
+        <h3>Buat Akun Baru</h3>
+        <p>Daftar sebagai anggota perpustakaan</p>
+      </div>
+      <div class="field">
+        <label for="regNama"><i class="fa-solid fa-user"></i> Nama Lengkap</label>
+        <input type="text" id="regNama" placeholder="Nama lengkap Anda" required />
+      </div>
+      <div class="field">
+        <label for="regNIM"><i class="fa-solid fa-id-card"></i> NIM / ID Anggota</label>
+        <input type="text" id="regNIM" placeholder="Contoh: 2024001234" required />
+      </div>
+      <div class="field">
+        <label for="regEmail"><i class="fa-solid fa-envelope"></i> Email</label>
+        <input type="email" id="regEmail" placeholder="nama@email.com" required />
+      </div>
+      <div class="field">
+        <label for="regPassword"><i class="fa-solid fa-lock"></i> Password</label>
+        <input type="password" id="regPassword" placeholder="Minimal 6 karakter" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">
+        <span class="btn-label">Daftar</span>
+        <div class="spin-sm"></div>
+      </button>
+      <p class="auth-switch">Sudah punya akun? <a href="#" data-switch="login">Masuk di sini</a></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================== BOOK DETAIL MODAL ============================================== -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal-card book-detail-modal">
+    <button class="modal-close" id="bookModalClose">&times;</button>
+    <div id="bookModalContent"></div>
+  </div>
+</div>
+
+<!-- ============================================== NAVBAR ============================================== -->
+<nav id="nav">
+  <div class="wrap nav-row">
+    <a href="#hero" class="nav-brand">
+      <div class="nav-mark">L</div>
+      <span class="nav-name">Libra<em>Verse</em></span>
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#hero" class="nav-link active">Beranda</a></li>
+      <li><a href="#catalog" class="nav-link">Katalog</a></li>
+      <li><a href="#pinjam" class="nav-link">Peminjaman</a></li>
+      <li><a href="#riwayat" class="nav-link">Riwayat</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <div class="nav-badge" id="statusBadge">
+        <span class="badge-dot" id="sysDot"></span>
+        <span id="sysLabel">Menghubungkan...</span>
+      </div>
+      <div class="nav-user" id="navUser" style="display:none;">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <p class="dropdown-name" id="dropdownName">User</p>
+            <p class="dropdown-email" id="dropdownEmail">user@email.com</p>
+          </div>
+          <hr class="dropdown-divider" />
+          <a href="#riwayat" class="dropdown-item"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Saya</a>
+          <button class="dropdown-item" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="btnLoginNav" style="display:flex;">
+        <i class="fa-solid fa-right-to-bracket"></i> Masuk
+      </button>
+      <button class="nav-burger" id="navBurger" aria-label="Buka menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#hero" onclick="tutupMenu()">Beranda</a>
+    <a href="#catalog" onclick="tutupMenu()">Katalog</a>
+    <a href="#pinjam" onclick="tutupMenu()">Peminjaman</a>
+    <a href="#riwayat" onclick="tutupMenu()">Riwayat</a>
+  </div>
+</nav>
+
+<!-- ============================================== HERO ============================================== -->
+<section id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="wrap">
+    <div class="hero-layout">
+      <div class="hero-text">
+        <p class="hero-eyebrow"><i class="fa-solid fa-building-columns"></i> Perpustakaan Digital</p>
+        <h1 class="hero-h1">
+          Temukan dunia baru<br/>
+          di setiap halaman<br/>
+          <span class="hl">yang kamu baca.</span>
+        </h1>
+        <p class="hero-p">
+          LibraVerse memudahkan Anda mencari, meminjam, dan melacak koleksi
+          perpustakaan secara digital. Semua terintegrasi &mdash; tanpa antre,
+          tanpa formulir kertas.
+        </p>
+        <div class="hero-cta">
+          <a href="#catalog" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Jelajahi Katalog</a>
+          <a href="#pinjam" class="btn btn-ghost"><i class="fa-solid fa-hand-holding-heart"></i> Pinjam Buku</a>
+        </div>
+        <div class="hero-stats-mini">
+          <div class="hero-stat-item">
+            <span class="hero-stat-num" id="heroTotalBooks">0</span>
+            <span class="hero-stat-label">Koleksi</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-num" id="heroTotalMembers">0</span>
+            <span class="hero-stat-label">Anggota</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-num" id="heroActiveBorrows">0</span>
+            <span class="hero-stat-label">Aktif Dipinjam</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-card-stack">
+          <div class="hero-float-card hfc-1">
+            <div class="hfc-icon"><i class="fa-solid fa-book-open"></i></div>
+            <div class="hfc-text">
+              <span class="hfc-title">Koleksi Digital</span>
+              <span class="hfc-sub">Ratusan judul tersedia</span>
+            </div>
+          </div>
+          <div class="hero-float-card hfc-2">
+            <div class="hfc-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="hfc-text">
+              <span class="hfc-title">Peminjaman Cepat</span>
+              <span class="hfc-sub">Proses dalam hitungan detik</span>
+            </div>
+          </div>
+          <div class="hero-float-card hfc-3">
+            <div class="hfc-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="hfc-text">
+              <span class="hfc-title">Real-time Data</span>
+              <span class="hfc-sub">Sinkronisasi otomatis</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-glow"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== KATALOG ============================================== -->
+<section id="catalog" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="tag"><i class="fa-solid fa-book"></i> Koleksi Buku</p>
+      <h2 class="section-h2">Jelajahi katalog perpustakaan</h2>
+      <p class="section-desc">
+        Cari berdasarkan judul, penulis, atau filter berdasarkan genre.
+        Klik kartu buku untuk melihat detail lengkap.
+      </p>
+    </div>
+
+    <div class="catalog-toolbar">
+      <div class="search-field">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Cari judul atau penulis..." autocomplete="off" />
+      </div>
+      <select id="catFilter" class="select-styled">
+        <option value="">Semua Genre</option>
+      </select>
+      <div class="catalog-view-toggle">
+        <button class="view-btn active" id="viewGrid" title="Grid"><i class="fa-solid fa-table-cells-large"></i></button>
+        <button class="view-btn" id="viewList" title="List"><i class="fa-solid fa-list"></i></button>
+      </div>
+    </div>
+
+    <div class="catalog-info">
+      <span id="catalogCount">Memuat...</span>
+    </div>
+
+    <div id="bookGrid" class="book-grid"></div>
+  </div>
+</section>
+
+<!-- ============================================== FORM PEMINJAMAN ============================================== -->
+<section id="pinjam" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="tag"><i class="fa-solid fa-hand-holding-heart"></i> Form Peminjaman</p>
+      <h2 class="section-h2">Pinjam buku dengan mudah</h2>
+      <p class="section-desc">
+        Isi formulir di bawah untuk mengajukan peminjaman buku. Anda harus login terlebih dahulu.
+      </p>
+    </div>
+
+    <div class="form-layout">
+      <div class="form-box">
+        <div class="form-box-header">
+          <i class="fa-solid fa-file-pen"></i>
+          <div>
+            <h3>Data Peminjaman</h3>
+            <p class="form-sub">Semua kolom wajib diisi</p>
+          </div>
+        </div>
+
+        <form id="borrowForm" novalidate>
+          <div class="field">
+            <label for="inputBuku"><i class="fa-solid fa-book"></i> Pilih Buku</label>
+            <select id="inputBuku" required>
+              <option value="">-- Pilih buku --</option>
+            </select>
+            <p class="err-msg" id="eBuku">Pilih satu buku dari daftar.</p>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="inputDurasi"><i class="fa-solid fa-calendar-days"></i> Durasi (hari)</label>
+              <input type="number" id="inputDurasi" placeholder="1 – 14" min="1" max="14" required />
+              <p class="err-msg" id="eDurasi">Durasi 1 sampai 14 hari.</p>
+            </div>
+            <div class="field">
+              <label for="inputTgl"><i class="fa-solid fa-calendar"></i> Tanggal Pinjam</label>
+              <input type="date" id="inputTgl" required />
+              <p class="err-msg" id="eTgl">Tanggal harus dipilih.</p>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="btnSubmit">
+            <span class="btn-label"><i class="fa-solid fa-paper-plane"></i> Konfirmasi Peminjaman</span>
+            <div class="spin-sm"></div>
+          </button>
+        </form>
+      </div>
+
+      <div id="outputWrap" class="output-panel">
+        <div class="out-empty" id="outputPH">
+          <div class="out-empty-icon"><i class="fa-solid fa-receipt"></i></div>
+          <h4>Struk Konfirmasi</h4>
+          <p>Struk peminjaman akan muncul di sini setelah Anda mengirim formulir.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== RIWAYAT ============================================== -->
+<section id="riwayat" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="tag"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Peminjaman</p>
+      <h2 class="section-h2">Buku yang sedang dipinjam</h2>
+      <p class="section-desc">
+        Klik tombol Kembalikan jika buku sudah dikembalikan ke perpustakaan.
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Buku</th>
+            <th>Tgl. Pinjam</th>
+            <th>Tgl. Kembali</th>
+            <th>Durasi</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody">
+          <tr><td colspan="7" class="t-empty">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== FOOTER ============================================== -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo-row">
+          <div class="nav-mark">L</div>
+          <span class="footer-logo">Libra<em>Verse</em></span>
+        </div>
+        <p class="footer-desc">Sistem perpustakaan digital modern dengan integrasi real-time database untuk kemudahan pengelolaan koleksi buku.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navigasi</h4>
+        <a href="#hero">Beranda</a>
+        <a href="#catalog">Katalog</a>
+        <a href="#pinjam">Peminjaman</a>
+        <a href="#riwayat">Riwayat</a>
+      </div>
+      <div class="footer-links">
+        <h4>Sistem</h4>
+        <a href="admin.html">Admin Panel</a>
+        <a href="#" id="footerLogin">Login / Daftar</a>
+      </div>
+    </div>
+    <hr class="footer-divider" />
+    <p class="footer-copy">&copy; 2025 LibraVerse &mdash; Sistem Perpustakaan Digital</p>
+  </div>
+</footer>
+
+<!-- ============================================== TOAST CONTAINER ============================================== -->
+<div id="toastContainer"></div>
+
+<!-- ============================================== SCRIPTS ============================================== -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

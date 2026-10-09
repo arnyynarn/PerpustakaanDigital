@@ -1,0 +1,11 @@
+{
+  "name": "libraverse-perpustakaan-digital",
+  "version": "1.0.0",
+  "description": "Sistem Perpustakaan Digital Modern dengan Real-time Firebase Cloud Database",
+  "scripts": {
+    "start": "python -m http.server 8080"
+  },
+  "dependencies": {
+    "firebase": "^13.0.0"
+  }
+}
