@@ -2,6 +2,9 @@
 
 **LibraVerse** adalah sistem informasi perpustakaan digital interaktif dengan arsitektur dua sisi (**Client / Anggota** dan **Admin / Pengelola**), tampilan modern bernuansa *dark glassmorphism*, serta dukungan **penyimpanan data real-time** ganda (Mode Sinkronisasi Lokal Lintas Tab & Cloud Database via Firebase Firestore).
 
+<img width="1535" height="775" alt="image" src="https://github.com/user-attachments/assets/af6f46da-4ab9-4079-b86c-01381059b8d9" />
+
+
 ---
 
 ## 🌟 Fitur Utama
